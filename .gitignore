@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+queens_results.db
+.venv/
+venv/
+.env

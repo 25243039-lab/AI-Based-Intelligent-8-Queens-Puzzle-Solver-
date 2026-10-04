@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Based Intelligent 8-Queens Puzzle Solver | Mini Project</title>
+  <meta name="description" content="An interactive AI mini project demonstrating Backtracking Search and Constraint Satisfaction Problem (CSP) on the classic 8-Queens puzzle.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet via Flask url_for -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP NAVIGATION BAR
+       ======================================================================== -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">♛</span>
+      <span>8-Queens AI Solver</span>
+      <span class="brand-badge">CSP & Backtracking</span>
+    </div>
+
+    <nav>
+      <ul class="nav-links">
+        <li><button class="nav-btn active" data-tab="home">🏠 Home</button></li>
+        <li><button class="nav-btn" data-tab="game">🎮 Play Game</button></li>
+        <li><button class="nav-btn" data-tab="visualizer">🤖 AI Solver & Steps</button></li>
+        <li><button class="nav-btn" data-tab="how-it-works">📚 How AI Works</button></li>
+        <li><button class="nav-btn" data-tab="results">📊 Performance</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ========================================================================
+       MAIN CONTENT CONTAINER
+       ======================================================================== -->
+  <main class="main-wrapper">
+
+    <!-- ======================================================================
+         SECTION 1: HOME PAGE
+         ====================================================================== -->
+    <section id="tab-home" class="tab-section active">
+      <div class="academic-hero">
+        <div class="academic-dept-tag">
+          <span>🎓</span> Department of Computer Science & Artificial Intelligence
+        </div>
+        <h1>AI-Based Intelligent<br>8-Queens Puzzle Solver</h1>
+        <p class="hero-subtitle">
+          An interactive academic project demonstrating the <strong>Backtracking Search Algorithm</strong> and <strong>Constraint Satisfaction Problem (CSP)</strong> principles on an 8×8 chessboard.
+        </p>
+
+        <div class="hero-tags">
+          <div class="tag-badge"><strong>Technique:</strong> Constraint Satisfaction (CSP)</div>
+          <div class="tag-badge"><strong>Algorithm:</strong> Backtracking Search (DFS with Pruning)</div>
+          <div class="tag-badge"><strong>Complexity:</strong> O(N!) Time | O(N) Space</div>
+          <div class="tag-badge"><strong>Total Solutions:</strong> 92 Distinct Placements</div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-navigate="game">
+            <span>🎮 Play Puzzle Yourself</span>
+          </button>
+          <button class="btn btn-secondary" data-navigate="visualizer">
+            <span>🤖 Watch AI Solver & Steps</span>
+          </button>
+          <button class="btn btn-secondary" data-navigate="how-it-works">
+            <span>📖 Learn the AI Concept</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feature Highlight Cards -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box">♟️</div>
+          <h3>Interactive 8×8 Chessboard</h3>
+          <p>Click on any square to place or remove queens. Features standard algebraic rank (1–8) and file (a–h) chess coordinates.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">⚡</div>
+          <h3>Real-Time Conflict Highlighting</h3>
+          <p>Instantly detects and draws visual attack lines when two queens threaten each other along rows, columns, or diagonals.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">🧠</div>
+          <h3>Real Backtracking AI</h3>
+          <p>No fake solutions. Solves the puzzle using pure Constraint Satisfaction Problem (CSP) backtracking search in Python.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">🎬</div>
+          <h3>Step-by-Step Search Visualizer</h3>
+          <p>Step through every try, conflict, placement, and backtrack. Watch how AI prunes impossible branches in real-time.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">💡</div>
+          <h3>Intelligent Hint & Dead-End Engine</h3>
+          <p>Uses forward lookahead to suggest safe placements or alert you when a partial board state is mathematically doomed.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">📈</div>
+          <h3>Performance & Viva Guide</h3>
+          <p>SQLite metrics tracking human vs machine solving speeds, plus an academic Viva Voce Q&A cheat sheet for college viva.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 2: INTERACTIVE GAME
+         ====================================================================== -->
+    <section id="tab-game" class="tab-section">
+      <div class="layout-split">
+        
+        <!-- Left: Interactive Chessboard -->
+        <div class="board-container-card">
+
+          <!-- Cute Visual Feedback Mascot Companion -->
+          <div id="mascotCompanion" class="mascot-widget state-neutral" aria-live="polite">
+            <div class="mascot-avatar-container">
+              <!-- SVG Cute Royal Queen Mascot -->
+              <svg id="mascotSvg" class="mascot-svg" viewBox="0 0 100 100" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <filter id="mascotGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#f59e0b" flood-opacity="0.4"/>
+                  </filter>
+                </defs>
+
+                <g class="mascot-character-body">
+                  <!-- Collar & Robe Base -->
+                  <path d="M26,88 Q50,96 74,88 L72,80 Q50,85 28,80 Z" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5" />
+                  <path d="M36,81 L50,93 L64,81 Q50,86 36,81 Z" fill="#fbbf24" />
+
+                  <!-- Cute Chibi Head -->
+                  <circle cx="50" cy="54" r="32" fill="#fffbeb" stroke="#fef3c7" stroke-width="2" />
+
+                  <!-- Rosy Cheeks -->
+                  <ellipse class="mascot-blush" cx="28" cy="62" rx="5.5" ry="3.2" fill="#fca5a5" opacity="0.85" />
+                  <ellipse class="mascot-blush" cx="72" cy="62" rx="5.5" ry="3.2" fill="#fca5a5" opacity="0.85" />
+
+                  <!-- Neutral Expression -->
+                  <g class="mascot-expr-neutral">
+                    <circle cx="37" cy="50" r="4.5" fill="#1e293b" />
+                    <circle cx="35.5" cy="48.5" r="1.5" fill="#ffffff" />
+                    <circle cx="63" cy="50" r="4.5" fill="#1e293b" />
+                    <circle cx="61.5" cy="48.5" r="1.5" fill="#ffffff" />
+                    <path d="M46,60 Q50,64 54,60" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" />
+                  </g>
+
+                  <!-- Sad / Crying Expression -->
+                  <g class="mascot-expr-sad">
+                    <path d="M33,48 Q37,54 41,48" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M59,48 Q63,54 67,48" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M44,65 Q50,59 56,65" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" />
+                    <!-- Animated Crying Tears -->
+                    <path class="tear-drop" d="M31,54 C28,62 34,62 31,54 Z" fill="#60a5fa" />
+                    <path class="tear-drop" d="M69,54 C66,62 72,62 69,54 Z" fill="#60a5fa" />
+                  </g>
+
+                  <!-- Happy / Smiling Expression -->
+                  <g class="mascot-expr-happy">
+                    <path d="M32,51 Q37,43 42,51" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M58,51 Q63,43 68,51" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M44,58 Q50,70 56,58 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="1.2" />
+                  </g>
+
+                  <!-- Celebration Expression -->
+                  <g class="mascot-expr-celebrate">
+                    <path d="M30,50 L42,50 M36,44 L36,56 M32,46 L40,54 M32,54 L40,46" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
+                    <path d="M58,50 L70,50 M64,44 L64,56 M60,46 L68,54 M60,54 L68,46" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
+                    <path d="M43,58 Q50,73 57,58 Z" fill="#f43f5e" stroke="#be123c" stroke-width="1.2" />
+                    <path d="M47,67 Q50,69 53,67" fill="#fb7185" />
+                  </g>
+
+                  <!-- Golden Royal Queen Crown -->
+                  <g class="mascot-crown" filter="url(#mascotGlow)">
+                    <path d="M34,26 L38,12 L50,22 L62,12 L66,26 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1.5" stroke-linejoin="round" />
+                    <circle cx="50" cy="20" r="2.5" fill="#ef4444" />
+                    <circle cx="38" cy="14" r="1.5" fill="#38bdf8" />
+                    <circle cx="62" cy="14" r="1.5" fill="#38bdf8" />
+                  </g>
+                </g>
+              </svg>
+              <!-- Floating Particles Layer -->
+              <div id="mascotParticles" class="mascot-particles-layer"></div>
+            </div>
+
+            <!-- Dialogue Speech Bubble -->
+            <div class="mascot-dialogue-box">
+              <div class="mascot-bubble-tail"></div>
+              <div id="mascotDialogueText" class="mascot-speech-text">
+                Hi! Place 8 queens safely on the board! ♛
+              </div>
+            </div>
+          </div>
+
+          <div class="chessboard-outer">
+            <!-- Rank numbers (8 down to 1) -->
+            <div class="board-rank-labels">
+              <span>8</span><span>7</span><span>6</span><span>5</span>
+              <span>4</span><span>3</span><span>2</span><span>1</span>
+            </div>
+
+            <!-- Board Grid -->
+            <div id="playerChessboard" class="chessboard"></div>
+
+            <!-- SVG attack lines overlay -->
+            <svg id="playerConflictOverlay" class="conflict-svg-layer"></svg>
+
+            <!-- File letters (a through h) -->
+            <div class="board-file-labels">
+              <span>a</span><span>b</span><span>c</span><span>d</span>
+              <span>e</span><span>f</span><span>g</span><span>h</span>
+            </div>
+          </div>
+          <p style="margin-top: 1.75rem; font-size: 0.85rem; color: var(--text-dim);">
+            💡 Tip: Click any square to place or remove a Queen. The board prevents illegal overlap.
+          </p>
+        </div>
+
+        <!-- Right: Game Controls, Metrics, Hints -->
+        <div class="panel-card">
+          <h2>
+            <span>Play Mode</span>
+            <span class="brand-badge">Goal: Place 8 Queens</span>
+          </h2>
+
+          <!-- Status Banner -->
+          <div id="gameStatusBanner" class="status-banner status-info">
+            <span>Click on any square to place your first queen.</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="queens-progress-container">
+            <div class="progress-header">
+              <span>Placement Progress</span>
+              <span id="queensCount" style="font-weight: 700; color: #fff;">0 / 8</span>
+            </div>
+            <div class="progress-track">
+              <div id="queensProgressBar" class="progress-bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- KPI Metric Boxes -->
+          <div class="metrics-row">
+            <div class="metric-box">
+              <div class="metric-label">Timer</div>
+              <div id="gameTimer" class="metric-value primary">00:00</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Moves Made</div>
+              <div id="movesCount" class="metric-value accent">0</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Target</div>
+              <div class="metric-value success">8 Safe</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="actions-cluster">
+            <div class="btn-group-row">
+              <button id="checkSolutionBtn" class="btn btn-success">
+                <span>✓ Check Solution</span>
+              </button>
+              <button id="getHintBtn" class="btn btn-accent">
+                <span>💡 AI Hint</span>
+              </button>
+            </div>
+
+            <div class="btn-group-row">
+              <button id="aiAutoCompleteBtn" class="btn btn-primary">
+                <span>🤖 AI Complete Board</span>
+              </button>
+              <button id="resetGameBtn" class="btn btn-secondary">
+                <span>🔄 Reset Board</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Rules Checklist -->
+          <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: var(--radius-md); font-size: 0.82rem; color: var(--text-muted);">
+            <strong style="color: #fff; display: block; margin-bottom: 0.4rem;">Constraint Checklist:</strong>
+            <ul style="padding-left: 1.2rem; line-height: 1.6;">
+              <li>No two queens in the same <strong>Row</strong> (1 queen per row).</li>
+              <li>No two queens in the same <strong>Column</strong> (1 queen per column).</li>
+              <li>No two queens along any <strong>Diagonal</strong> (upper-left to lower-right or upper-right to lower-left).</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 3: AI SOLVER & STEP-BY-STEP VISUALIZER
+         ====================================================================== -->
+    <section id="tab-visualizer" class="tab-section">
+      <div class="layout-split">
+
+        <!-- Left: Visualizer Board -->
+        <div class="board-container-card">
+          <div class="chessboard-outer">
+            <div class="board-rank-labels">
+              <span>8</span><span>7</span><span>6</span><span>5</span>
+              <span>4</span><span>3</span><span>2</span><span>1</span>
+            </div>
+
+            <div id="visChessboard" class="chessboard"></div>
+            <svg id="visConflictOverlay" class="conflict-svg-layer"></svg>
+
+            <div class="board-file-labels">
+              <span>a</span><span>b</span><span>c</span><span>d</span>
+              <span>e</span><span>f</span><span>g</span><span>h</span>
+            </div>
+          </div>
+
+          <!-- Color Legend for Search States -->
+          <div class="vis-legend" style="margin-top: 1.5rem;">
+            <div class="legend-item"><span class="legend-dot dot-testing"></span> Testing (Try)</div>
+            <div class="legend-item"><span class="legend-dot dot-placed"></span> Safe (Placed)</div>
+            <div class="legend-item"><span class="legend-dot dot-conflict"></span> Conflict (Failed)</div>
+            <div class="legend-item"><span class="legend-dot dot-backtrack"></span> Backtrack (Pruned)</div>
+          </div>
+
+          <!-- All 92 Solutions Dropdown -->
+          <div class="solutions-browser" style="width: 100%;">
+            <div>
+              <strong style="font-size: 0.85rem; color: #fff;">Explore All 92 Solutions:</strong>
+              <div style="font-size: 0.75rem; color: var(--text-dim);">Browse every mathematically distinct solution</div>
+            </div>
+            <div class="solution-picker-group">
+              <select id="visSolutionsSelect" class="solution-select">
+                <option value="0">Loading solutions...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Visualizer Controls, Tree Stats, Console Log -->
+        <div class="panel-card">
+          <h2>
+            <span>AI Search Visualizer</span>
+            <button id="instantSolveBtn" class="btn btn-sm btn-accent" title="Solve immediately without animation">
+              ⚡ Instant Solve
+            </button>
+          </h2>
+
+          <!-- Status Banner -->
+          <div id="visStatusBanner" class="status-banner status-info">
+            <span>Press Play to watch the Backtracking Search explore the state space tree.</span>
+          </div>
+
+          <!-- Playback Controls Bar -->
+          <div class="vis-controls-bar">
+            <div class="playback-buttons">
+              <button id="visPlayBtn" class="btn btn-primary btn-sm">
+                <span>▶ Play AI</span>
+              </button>
+              <button id="visPrevBtn" class="btn btn-secondary btn-sm" title="Previous search step">
+                <span>⏮ Prev</span>
+              </button>
+              <button id="visNextBtn" class="btn btn-secondary btn-sm" title="Next search step">
+                <span>⏭ Next</span>
+              </button>
+              <button id="visResetBtn" class="btn btn-secondary btn-sm" title="Reset visualizer">
+                <span>🔄 Reset</span>
+              </button>
+            </div>
+
+            <div class="speed-control">
+              <span>Speed:</span>
+              <input type="range" id="visSpeedSlider" min="1" max="10" value="8" title="Adjust animation delay">
+              <span id="visSpeedLabel" style="font-family: var(--font-mono); color: #fff;">250ms</span>
+            </div>
+          </div>
+
+          <!-- Search Tree Live Telemetry -->
+          <div class="metrics-row">
+            <div class="metric-box">
+              <div class="metric-label">Step Index</div>
+              <div id="visStepCount" class="metric-value primary">0</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Nodes Visited</div>
+              <div id="visNodesCount" class="metric-value accent">0</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Backtracks</div>
+              <div id="visBacktracksCount" class="metric-value" style="color: #f97316;">0</div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+              Search Tree Decision Log:
+            </span>
+            <span id="visDepthCount" style="font-family: var(--font-mono); font-size: 0.8rem; color: #60a5fa;">Depth: 0 / 8</span>
+          </div>
+
+          <!-- Scrollable Decision Log Terminal -->
+          <div id="visLogConsole" class="vis-log-container">
+            <div class="vis-log-entry">Visualizer initialized. Ready to begin state space search.</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 4: HOW AI WORKS (ACADEMIC & VIVA PREPARATION)
+         ====================================================================== -->
+    <section id="tab-how-it-works" class="tab-section">
+      <div class="academic-section-card">
+        <h2><span>🧠</span> Constraint Satisfaction Problem (CSP) Formulation</h2>
+        <p style="color: var(--text-muted);">
+          In Artificial Intelligence, the 8-Queens problem is a canonical benchmark for <strong>Constraint Satisfaction Problems (CSPs)</strong>. A CSP is defined by a triplet \((X, D, C)\):
+        </p>
+
+        <div class="csp-formula-grid">
+          <div class="formula-card">
+            <span class="pill">Variables (X)</span>
+            <div class="formula-code">X = {Q₀, Q₁, Q₂, ..., Q₇}</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              8 variables, where variable <strong>Qᵢ</strong> represents the queen located on <strong>Row i</strong>.
+            </p>
+          </div>
+
+          <div class="formula-card">
+            <span class="pill">Domains (D)</span>
+            <div class="formula-code">Dᵢ = {0, 1, 2, 3, 4, 5, 6, 7}</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              The domain for each variable contains the 8 possible <strong>column indices</strong> for that row.
+            </p>
+          </div>
+
+          <div class="formula-card">
+            <span class="pill">Constraints (C)</span>
+            <div class="formula-code">Qᵢ ≠ Qⱼ &amp; |Qᵢ - Qⱼ| ≠ |i - j|</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              <strong>Row:</strong> Implicitly satisfied (1 queen/row).<br>
+              <strong>Column:</strong> No two queens share column.<br>
+              <strong>Diagonal:</strong> Slope \(\Delta y / \Delta x \neq \pm 1\).
+            </p>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 0.75rem; color: #fff;">Search Space Reduction: Brute Force vs CSP Backtracking</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          How dramatically does Backtracking search with constraint pruning reduce computation compared to naive generation?
+        </p>
+
+        <div class="comparison-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Search Method</th>
+                <th>Possible Combinations Explored</th>
+                <th>Nodes Visited for First Solution</th>
+                <th>Time Taken</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Naive Brute Force (64 choose 8)</strong></td>
+                <td>\(\binom{64}{8} = 4,426,165,368\) states</td>
+                <td>Billions of evaluations</td>
+                <td>Minutes / Hours</td>
+              </tr>
+              <tr>
+                <td><strong>Permutation Brute Force (8⁸)</strong></td>
+                <td>\(8^8 = 16,777,216\) states</td>
+                <td>Millions of states</td>
+                <td>Seconds</td>
+              </tr>
+              <tr>
+                <td><strong>CSP Backtracking with Pruning (Our AI)</strong></td>
+                <td>Search space pruned immediately on conflict</td>
+                <td><strong>876 nodes</strong> (only 105 backtracks!)</td>
+                <td><strong>&lt; 5 milliseconds</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Viva Voce FAQ Accordion -->
+      <div class="academic-section-card">
+        <h2><span>🎓</span> Viva Voce & Oral Defense Preparation Guide</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+          Standard questions asked by professors and examiners during project defense:
+        </p>
+
+        <div class="viva-list">
+          <div class="viva-item">
+            <button class="viva-question">
+              <span>1. Why is 8-Queens classified as a Constraint Satisfaction Problem (CSP)?</span>
+              <span class="viva-icon">▼</span>
+            </button>
+            <div class="viva-answer">
+              Because rather than searching for an optimal sequence of actions toward a path cost, a CSP is concerned purely with finding a state that satisfies a predefined set of constraints. In 8-Queens, variables are the 8 rows, values are the column positions, and constraints mandate no attacks along rows, columns, or diagonals.
+            </div>
+          </div>
+
+          <div class="viva-item">
+            <button class="viva-question">
+              <span>2. How does the diagonal check condition <code>|Q[i] - Q[j]| == |i - j|</code> work mathematically?</span>
+              <span class="viva-icon">▼</span>
+            </button>
+            <div class="viva-answer">
+              On a 2D Cartesian grid, any line at a 45° diagonal angle has a slope \(m = \Delta y / \Delta x = \pm 1\). Therefore, \(\frac{y_2 - y_1}{x_2 - x_1} = \pm 1\), which rearranges to \(|y_2 - y_1| = |x_2 - x_1|\). In our representation, row index is \(x\) and column index is \(y\), so two queens at \((i, Q_i)\) and \((j, Q_j)\) conflict along a diagonal if and only if \(|Q_i - Q_j| = |i - j|\).
+            </div>
+          </div>
+
+          <div class="viva-item">
+            <button class="viva-question">
+              <span>3. What is "pruning" and why is backtracking so much faster than brute-force?</span>
+              <span class="viva-icon">▼</span>
+            </button>
+            <div class="viva-answer">
+              Pruning means rejecting an entire subtree of the state space tree as soon as a partial assignment violates any constraint. If placing a queen at row 2, col 1 causes a conflict with row 1, backtracking immediately stops exploring any placements for rows 3 through 8 under that branch, eliminating thousands of pointless evaluations in a single step.
+            </div>
+          </div>
+
+          <div class="viva-item">
+            <button class="viva-question">
+              <span>4. How many total solutions exist for 8-Queens?</span>
+              <span class="viva-icon">▼</span>
+            </button>
+            <div class="viva-answer">
+              There are exactly <strong>92 distinct solutions</strong>. If rotational and reflective symmetries (isomorphisms) are factored out, there are <strong>12 fundamental solutions</strong>. Our AI solver finds and allows you to view all 92 distinct solutions.
+            </div>
+          </div>
+
+          <div class="viva-item">
+            <button class="viva-question">
+              <span>5. What are the Time and Space Complexities?</span>
+              <span class="viva-icon">▼</span>
+            </button>
+            <div class="viva-answer">
+              <strong>Time Complexity:</strong> Upper bound is \(O(N!)\) because each row placed leaves at most \(N-1, N-2, \dots\) valid choices, but the effective branching factor is drastically lower due to aggressive pruning. In our 8-Queens solver, the first solution is found after just 876 node evaluations.<br>
+              <strong>Space Complexity:</strong> \(O(N)\) auxiliary stack space, since the recursion depth is at most \(N\) rows.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 5: PERFORMANCE & DATABASE RESULTS
+         ====================================================================== -->
+    <section id="tab-results" class="tab-section">
+      <div class="panel-card">
+        <h2>
+          <span>Performance & Metrics Dashboard</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="refreshStatsBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
+            <button id="clearStatsBtn" class="btn btn-danger btn-sm">🗑 Clear History</button>
+          </div>
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+          Recorded game sessions and algorithmic benchmarks stored persistently in <strong>SQLite (queens_results.db)</strong>.
+        </p>
+
+        <!-- KPI Grid -->
+        <div class="metrics-row" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+          <div class="metric-box">
+            <div class="metric-label">Total Runs</div>
+            <div id="statTotalRuns" class="metric-value primary">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">User Solved</div>
+            <div id="statUserSolved" class="metric-value success">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">AI Solved</div>
+            <div id="statAiSolved" class="metric-value accent">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">User Win Rate</div>
+            <div id="statUserWinRate" class="metric-value">0%</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Avg User Time</div>
+            <div id="statAvgUserTime" class="metric-value">0s</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Avg AI Time</div>
+            <div id="statAvgAiTime" class="metric-value">0s</div>
+          </div>
+        </div>
+
+        <!-- Recent Runs Data Table -->
+        <div class="data-table-card" style="padding: 0; overflow: hidden; margin-top: 1.5rem;">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Player</th>
+                <th>Mode</th>
+                <th>Queens Placed</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="recentSessionsTbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-dim); padding: 1.5rem;">Loading records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       VICTORY MODAL DIALOG
+       ======================================================================== -->
+  <div id="winModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-icon">🏆</div>
+      <h2 id="winTitle">Puzzle Solved!</h2>
+      <p id="winMessage">All 8 queens successfully placed with zero attacking lines.</p>
+
+      <div class="modal-stats">
+        <div class="modal-stat-item">
+          <span>Solving Time</span>
+          <strong id="winTimeStat">0s</strong>
+        </div>
+        <div class="modal-stat-item">
+          <span>Moves Made</span>
+          <strong id="winMovesStat">0</strong>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modalPlayAgainBtn" class="btn btn-primary">🎮 Play Again</button>
+        <button id="modalCloseBtn" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      <strong>AI-Based Intelligent 8-Queens Puzzle Solver</strong> — College Mini Project in Artificial Intelligence.<br>
+      Developed with Python Flask, CSP formulation, and Backtracking Search Algorithm.
+    </p>
+  </footer>
+
+  <!-- Scripts via Flask url_for -->
+  <script src="{{ url_for('static', filename='js/chessboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ai_visualizer.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
